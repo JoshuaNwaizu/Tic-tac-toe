@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useTicTacToe } from "../contexts/TicTacToeContext";
 import { useEffect } from "react";
 import X from "./X";
@@ -16,6 +16,8 @@ const Board = () => {
     winningCells,
     showRestartModal,
   } = useTicTacToe();
+
+  const navigate = useNavigate();
 
   const { mode } = useParams();
 
@@ -74,7 +76,7 @@ const Board = () => {
               buttonLeft="QUIT"
               buttonRight="NEXT ROUND"
               buttonActions={{
-                quit: () => console.log("quit game"),
+                quit: () => navigate("/"),
                 nextRound: handleNextRound,
               }}
             />
@@ -86,7 +88,7 @@ const Board = () => {
               buttonLeft="QUIT"
               buttonRight="NEXT ROUND"
               buttonActions={{
-                quit: () => console.log("quit game"),
+                quit: () => navigate("/"),
                 nextRound: handleNextRound,
               }}
             />
@@ -104,7 +106,7 @@ const Board = () => {
             buttonLeft="QUIT"
             buttonRight="NEXT ROUND"
             buttonActions={{
-              quit: () => console.log("quit game"),
+              quit: () => navigate("/"),
               nextRound: handleNextRound,
             }}
           />

@@ -1,9 +1,13 @@
-function App() {
-  return (
-    <div className="flex items-center justify-center h-svh w-svw ">
-      <h1 className="font-bold text-[4rem]">Tic Tac Toe</h1>
-    </div>
-  );
-}
+import { createBrowserRouter, RouterProvider } from "react-router";
+import GamePage from "./game/GamePage";
+import Home from "./home/Home";
+
+const App = () => {
+  const router = createBrowserRouter([
+    { path: "/", element: <Home /> },
+    { path: "/game/:mode", element: <GamePage /> },
+  ]);
+  return <RouterProvider router={router} />;
+};
 
 export default App;

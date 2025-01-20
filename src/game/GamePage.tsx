@@ -5,7 +5,7 @@ import PlayerInfo from "./components/PlayerInfo";
 
 const GamePage = () => {
   return (
-    <div className="mt-5 flex h-screen flex-col items-center md:mt-0 md:justify-center">
+    <div className="flex flex-col items-center flex-shrink-0 mt-5 md:mt-0 md:justify-center">
       <Nav />
       <Board />
       <PlayerInfo />

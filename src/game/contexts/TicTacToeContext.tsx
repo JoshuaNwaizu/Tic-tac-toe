@@ -127,17 +127,14 @@ const getCpuMove = (board: string[]): number | null => {
   const blockingMove = findWinningMove(board, "X");
   if (blockingMove !== null) return blockingMove;
 
-  // Take center if available
-  if (board[4] === null) return 4;
-
   // Take corners if available
-  const corners = [0, 2, 6, 8];
-  const availableCorners = corners.filter((corner) => board[corner] === null);
-  if (availableCorners.length > 0) {
-    return availableCorners[
-      Math.floor(Math.random() * availableCorners.length)
-    ];
-  }
+  // const corners = [0, 2, 6, 8];
+  // const availableCorners = corners.filter((corner) => board[corner] === null);
+  // if (availableCorners.length > 0) {
+  //   return availableCorners[
+  //     Math.floor(Math.random() * availableCorners.length)
+  //   ];
+  // }
 
   // Take any available space
   const emptyCells = board
@@ -234,7 +231,11 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
       return {
         ...state,
         board: Array(9).fill(null),
-        currentPlayer: state.winner === "X" ? "O" : "X",
+        currentPlayer: state.isTied
+          ? state.currentPlayer
+          : state.winner === "X"
+            ? "O"
+            : "X",
         winner: null,
         winningCells: null,
       };

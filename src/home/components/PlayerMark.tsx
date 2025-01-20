@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTicTacToe } from "../../game/contexts/TicTacToeContext";
+import { motion } from "framer-motion";
 
 const PlayerMark = () => {
   const { dispatch, playerMark, currentPlayer } = useTicTacToe();
   const [selectedMark, setSelectedMark] = useState<"X" | "O">("X");
+
+  const variants = {
+    initial: { scale: 0 },
+    animate: { scale: 1 },
+    exit: { scale: 0 },
+  };
   useEffect(() => {
     setSelectedMark(playerMark);
   }, [playerMark]);
@@ -14,13 +21,32 @@ const PlayerMark = () => {
     console.log(playerMark, currentPlayer);
   };
   return (
-    <div className="flex h-[12.8125rem] w-[20.4375rem] flex-col items-center justify-center rounded-[0.9375rem] bg-[#1F3641] shadow-[inset_0_-8px_0_0_#10212A] md:w-[28.75rem]">
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={variants}
+      transition={{
+        duration: 0.5,
+        type: "spring",
+        ease: "backInOut",
+      }}
+      className="flex h-[12.8125rem] w-[20.4375rem] flex-col items-center justify-center rounded-[0.9375rem] bg-[#1F3641] shadow-[inset_0_-8px_0_0_#10212A] md:w-[28.75rem]"
+    >
       <div className="flex flex-col gap-6">
-        <h1 className="text-center text-base font-bold">
+        <h1 className="text-base font-bold text-center">
           PICK PLAYER 1’S MARK
         </h1>
         <div className="flex h-[4.5rem] w-[17.4375rem] flex-shrink-0 items-center justify-between rounded-[0.625rem] bg-[#1A2A33] px-2 md:w-[25.75rem]">
-          <p
+          <motion.p
+            initial={{ scale: 1 }}
+            animate={{ scale: playerMark === "X" ? 1 : 0.8 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
             className={`flex h-[3.5rem] w-[8.25rem] items-center rounded-[0.625rem] md:w-[12.375rem] ${selectedMark === "X" ? "bg-[#A8BFC9]" : null} justify-center`}
             onClick={() => handleMarkSelection("X")}
           >
@@ -36,12 +62,19 @@ const PlayerMark = () => {
                 fillRule="evenodd"
               />
             </svg>
-          </p>
-          <p
+          </motion.p>
+          <motion.p
+            initial={{ scale: 0 }}
+            animate={{ scale: playerMark === "O" ? 1 : 0.8 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
             className={`flex h-[3.5rem] w-[8.25rem] md:w-[12.375rem] ${selectedMark === "O" ? "bg-[#A8BFC9]" : null} items-center justify-center rounded-[0.625rem]`}
             onClick={() => handleMarkSelection("O")}
           >
-            {/* <img src="icon-o.svg" alt="o" className="h-[2rem] w-[2rem]" /> */}
             <svg
               width="32"
               height="32"
@@ -56,14 +89,17 @@ const PlayerMark = () => {
                 fill={selectedMark === "X" ? "#31C3BD" : "#1A2A33"}
               />
             </svg>
-          </p>
+          </motion.p>
         </div>
 
         <span className="text-center text-[0.875rem]">
+          REMEMBER : {playerMark} GOES FIRST
+        </span>
+        <span className="hidden text-center text-[0.875rem]">
           REMEMBER : X GOES FIRST
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

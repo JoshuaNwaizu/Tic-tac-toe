@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import { useTicTacToe } from "../contexts/TicTacToeContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import X from "./X";
 import O from "./O";
 import Modal from "../modal/Modal";
@@ -15,10 +15,12 @@ const Board = () => {
     winner,
     winningCells,
     showRestartModal,
+    gameMode,
+    playerMark,
   } = useTicTacToe();
 
   const navigate = useNavigate();
-
+  const [showModal, setShowModal] = useState<boolean>(false);
   const { mode } = useParams();
 
   const isCPUMode = mode === "cpu";
@@ -33,6 +35,18 @@ const Board = () => {
       return () => clearTimeout(cpuMoveTimeout);
     }
   }, [currentPlayer, winner, isCPUMode, dispatch]);
+
+  useEffect(() => {
+    if (winner || board.every((cell) => cell)) {
+      const modalTimeout = setTimeout(() => {
+        setShowModal(true);
+      }, 1000); // Delay for 1 second
+
+      return () => clearTimeout(modalTimeout);
+    } else {
+      setShowModal(false);
+    }
+  }, [winner, board, showRestartModal]);
   const handleClick = (i: number) => {
     if (board[i] || winner || (isCPUMode && currentPlayer === "O")) return;
 
@@ -65,38 +79,77 @@ const Board = () => {
 
   const displayModal = () => {
     // if (winningCells && winningCells.includes(i)) {
+
     if (winner) {
       return (
-        <Modal>
-          {winner === "X" ? (
-            <ModalContent
-              title="YOU WON!"
-              winnerType="X"
-              message="TAKES THE ROUND"
-              buttonLeft="QUIT"
-              buttonRight="NEXT ROUND"
-              buttonActions={{
-                quit: () => navigate("/"),
-                nextRound: handleNextRound,
-              }}
-            />
-          ) : (
-            <ModalContent
-              title="  OH NO, YOU LOST…"
-              message="TAKES THE ROUND"
-              winnerType="O"
-              buttonLeft="QUIT"
-              buttonRight="NEXT ROUND"
-              buttonActions={{
-                quit: () => navigate("/"),
-                nextRound: handleNextRound,
-              }}
-            />
-          )}
-        </Modal>
+        showModal && (
+          <Modal>
+            {winner === "X" ? (
+              <ModalContent
+                title={gameMode === "cpu" ? "YOU WON!" : "PLAYER 1 WINS!"}
+                winnerType="X"
+                message="TAKES THE ROUND"
+                buttonLeft="QUIT"
+                buttonRight="NEXT ROUND"
+                buttonActions={{
+                  quit: () => navigate("/"),
+                  nextRound: handleNextRound,
+                }}
+              />
+            ) : (
+              <ModalContent
+                title={
+                  gameMode === "cpu"
+                    ? playerMark === "O"
+                      ? "YOU WON!"
+                      : "OH NO, YOU LOST…"
+                    : currentPlayer === "X" // If X is current, O went second (and won)
+                      ? "PLAYER 2 WINS!"
+                      : "PLAYER 1 WINS!"
+                }
+                message="TAKES THE ROUND"
+                winnerType="O"
+                buttonLeft="QUIT"
+                buttonRight="NEXT ROUND"
+                buttonActions={{
+                  quit: () => navigate("/"),
+                  nextRound: handleNextRound,
+                }}
+              />
+            )}
+          </Modal>
+          //    <Modal>
+          //    {winner === "X" ? (
+          //      <ModalContent
+          //        title={
+          //          gameMode === "cpu" ? "YOU WON!" : "PLAYER 1 WINS!"
+          //        }
+          //        winnerType="X"
+          //        message="TAKES THE ROUND"
+          //        buttonLeft="QUIT"
+          //        buttonRight="NEXT ROUND"
+          //        buttonActions={{
+          //          quit: () => navigate("/"),
+          //          nextRound: handleNextRound,
+          //        }}
+          //      />
+          //    ) : (
+          //      <ModalContent
+          //        title={gameMode === "cpu" ? "OH NO, YOU LOST…" : "PLAYER 2 WINS!"}
+          //        message="TAKES THE ROUND"
+          //        winnerType="O"
+          //        buttonLeft="QUIT"
+          //        buttonRight="NEXT ROUND"
+          //        buttonActions={{
+          //          quit: () => navigate("/"),
+          //          nextRound: handleNextRound,
+          //        }}
+          //      />
+          //    )}
+          //  </Modal>
+        )
       );
     }
-    // }
     if (!winner && board.every((cell) => cell)) {
       return (
         <Modal>
@@ -113,6 +166,8 @@ const Board = () => {
         </Modal>
       );
     }
+
+    // }
 
     if (showRestartModal) {
       return (
@@ -134,7 +189,7 @@ const Board = () => {
   };
 
   return (
-    <div className="mt-[4rem] flex items-center justify-center min-[344px]:w-[21rem] md:w-[30rem]">
+    <div className="mt-[4rem] flex items-center justify-center min-[344px]:w-[21rem] md:w-[30rem] xl:w-[25rem]">
       <div className="grid grid-cols-3 gap-x-7 gap-y-7">
         {board.map((cell, i) => {
           return (
@@ -142,7 +197,7 @@ const Board = () => {
               <div
                 key={i}
                 onClick={() => handleClick(i)}
-                className={`flex h-[6rem] w-[6rem] items-center justify-center rounded-[0.625rem] bg-[#1F3641] pb-3 md:h-[8.75rem] md:w-[8.75rem] ${getWinningCellClass(i)} shadow-[inset_0_-8px_0_0_#10212A]`}
+                className={`flex h-[6rem] w-[6rem] items-center justify-center rounded-[0.625rem] bg-[#1F3641] pb-3 md:h-[8.75rem] md:w-[8.75rem] xl:h-[6.75rem] xl:w-[6.75rem] ${getWinningCellClass(i)} shadow-[inset_0_-8px_0_0_#10212A]`}
               >
                 {cell &&
                   (cell === "X" ? (
@@ -164,6 +219,7 @@ const Board = () => {
                   ))}
               </div>
               {displayModal()}
+              {/* {} */}
             </>
           );
         })}

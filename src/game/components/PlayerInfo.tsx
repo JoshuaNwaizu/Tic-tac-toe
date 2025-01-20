@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const className: string =
   "flex h-[4rem] w-[6rem] xl:h-[4.75rem] xl:w-[6.75rem] md:w-[8.75rem] md:h-[4.5rem] flex-col items-center justify-center  rounded-[0.625rem]";
 const PlayerInfo = () => {
-  const { score, gameMode, playerMark } = useTicTacToe();
+  const { score } = useTicTacToe();
   console.log(score);
   const leftButtonVariants = {
     initial: { x: -100, opacity: 0 },

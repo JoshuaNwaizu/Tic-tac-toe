@@ -3,7 +3,7 @@ import { useTicTacToe } from "../../game/contexts/TicTacToeContext";
 import { motion } from "framer-motion";
 
 const PlayerMark = () => {
-  const { dispatch, playerMark, currentPlayer } = useTicTacToe();
+  const { dispatch, playerMark, currentPlayer, gameMode } = useTicTacToe();
   const [selectedMark, setSelectedMark] = useState<"X" | "O">("X");
 
   const variants = {
@@ -15,11 +15,50 @@ const PlayerMark = () => {
     setSelectedMark(playerMark);
   }, [playerMark]);
 
+  // useEffect(() => {
+  //   if (gameMode === "cpu" && cpuMark === "X") {
+  //     const timer = setTimeout(() => {
+  //       dispatch({ type: "CPU_MOVE" });
+  //     }, 500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [gameMode, cpuMark, dispatch]);
+
+  // const handleMarkSelection = (mark: "X" | "O") => {
+  //   setSelectedMark(mark);
+
+  //   dispatch({ type: "SET_MARK", payload: { mark } });
+
+  //   console.log(
+  //     ` playerMark is ${playerMark} ,
+  //      currentPlayer is ${currentPlayer},
+  //      `,
+  //   );
+  // };
   const handleMarkSelection = (mark: "X" | "O") => {
     setSelectedMark(mark);
     dispatch({ type: "SET_MARK", payload: { mark } });
-    console.log(playerMark, currentPlayer);
+
+    // If the player chooses O, the CPU (X) should go first
+    if (gameMode === "cpu" && mark === "O") {
+      setTimeout(() => {
+        dispatch({ type: "CPU_MOVE" });
+      }, 500);
+    }
+
+    console.log(
+      `Player mark is ${mark}, 
+       Current player is ${currentPlayer}, 
+       Game mode is ${gameMode}`,
+    );
   };
+  // const handleMarkSelection = (mark: "X" | "O") => {
+  //   setSelectedMark(mark);
+  //   dispatch({ type: "SET_MARK", payload: { mark } });
+  //   dispatch({ type: "SET_PLAYER_ONE", payload:{ mark} });
+
+  //   console.log(playerMark, currentPlayer);
+  // };
   return (
     <motion.div
       initial="initial"
@@ -34,7 +73,7 @@ const PlayerMark = () => {
       className="flex h-[12.8125rem] w-[20.4375rem] flex-col items-center justify-center rounded-[0.9375rem] bg-[#1F3641] shadow-[inset_0_-8px_0_0_#10212A] md:w-[28.75rem]"
     >
       <div className="flex flex-col gap-6">
-        <h1 className="text-base font-bold text-center">
+        <h1 className="text-center text-base font-bold">
           PICK PLAYER 1’S MARK
         </h1>
         <div className="flex h-[4.5rem] w-[17.4375rem] flex-shrink-0 items-center justify-between rounded-[0.625rem] bg-[#1A2A33] px-2 md:w-[25.75rem]">
@@ -93,9 +132,6 @@ const PlayerMark = () => {
         </div>
 
         <span className="text-center text-[0.875rem]">
-          REMEMBER : {playerMark} GOES FIRST
-        </span>
-        <span className="hidden text-center text-[0.875rem]">
           REMEMBER : X GOES FIRST
         </span>
       </div>

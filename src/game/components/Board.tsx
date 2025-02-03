@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useNavigate /* useParams*/ } from "react-router";
 import { useTicTacToe } from "../contexts/TicTacToeContext";
 import { useEffect, useState } from "react";
 import X from "./X";
@@ -6,6 +6,7 @@ import O from "./O";
 import Modal from "../modal/Modal";
 
 import ModalContent from "../modal/ModalContent";
+import { AnimatePresence } from "framer-motion";
 
 const Board = () => {
   const {
@@ -17,24 +18,42 @@ const Board = () => {
     showRestartModal,
     gameMode,
     playerMark,
+    isBoardDisabled,
   } = useTicTacToe();
 
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { mode } = useParams();
+  // const { mode } = useParams();
 
-  const isCPUMode = mode === "cpu";
+  // const isCPUMode = mode === "cpu";
 
   useEffect(() => {
-    // Fix: Check for CPU mode and current player
-    if (isCPUMode && currentPlayer === "O" && !winner) {
-      const cpuMoveTimeout = setTimeout(() => {
-        dispatch({ type: "CPU_MOVE" });
-      }, 2000);
+    if (gameMode === "cpu") {
+      // If CPU is X and it's their turn, disable the board and make the CPU move
+      if (playerMark === "O" && currentPlayer === "X" && !winner) {
+        dispatch({ type: "IS_BOARD_DISABLED", payload: true }); // Disable the board
+        const cpuMoveTimeout = setTimeout(() => {
+          dispatch({ type: "CPU_MOVE" });
+        }, 500);
 
-      return () => clearTimeout(cpuMoveTimeout);
+        return () => clearTimeout(cpuMoveTimeout);
+      }
+
+      // If CPU is O and it's their turn, disable the board and make the CPU move
+      if (playerMark === "X" && currentPlayer === "O" && !winner) {
+        dispatch({ type: "IS_BOARD_DISABLED", payload: true }); // Disable the board
+        const cpuMoveTimeout = setTimeout(() => {
+          dispatch({ type: "CPU_MOVE" });
+        }, 500);
+
+        return () => clearTimeout(cpuMoveTimeout);
+      }
     }
-  }, [currentPlayer, winner, isCPUMode, dispatch]);
+  }, [currentPlayer, winner, gameMode, playerMark, dispatch]);
+
+  useEffect(() => {
+    console.log("Board updated:", board);
+  }, [board]);
 
   useEffect(() => {
     if (winner || board.every((cell) => cell)) {
@@ -47,15 +66,30 @@ const Board = () => {
       setShowModal(false);
     }
   }, [winner, board, showRestartModal]);
+
   const handleClick = (i: number) => {
-    if (board[i] || winner || (isCPUMode && currentPlayer === "O")) return;
+    if (
+      board[i] ||
+      winner ||
+      isBoardDisabled ||
+      (gameMode === "cpu" && currentPlayer !== playerMark)
+    ) {
+      console.log("Click blocked because:", {
+        cellOccupied: board[i],
+        hasWinner: winner,
+        boardDisabled: isBoardDisabled,
+        wrongTurn: gameMode === "cpu" && currentPlayer !== playerMark,
+      });
+      return;
+    }
 
     dispatch({ type: "PLAY", payload: { index: i } });
-    console.log(currentPlayer);
-    console.log(i);
-    console.log(board);
-    console.log(winner);
   };
+  useEffect(() => {
+    console.log("Current Player:", currentPlayer);
+    console.log("Is Board Disabled:", isBoardDisabled);
+  }, [currentPlayer, isBoardDisabled]);
+
   const getWinningCellClass = (i: number) => {
     if (winningCells && winningCells.includes(i)) {
       return winner === "X"
@@ -78,15 +112,41 @@ const Board = () => {
   };
 
   const displayModal = () => {
-    // if (winningCells && winningCells.includes(i)) {
-
     if (winner) {
       return (
         showModal && (
           <Modal>
-            {winner === "X" ? (
+            {gameMode === "cpu" ? (
+              // CPU mode messages
+              winner === playerMark ? (
+                <ModalContent
+                  title="YOU WON!"
+                  winnerType={winner}
+                  message="TAKES THE ROUND"
+                  buttonLeft="QUIT"
+                  buttonRight="NEXT ROUND"
+                  buttonActions={{
+                    quit: () => navigate("/"),
+                    nextRound: handleNextRound,
+                  }}
+                />
+              ) : (
+                <ModalContent
+                  title="OH NO, YOU LOST…"
+                  winnerType={winner}
+                  message="TAKES THE ROUND"
+                  buttonLeft="QUIT"
+                  buttonRight="NEXT ROUND"
+                  buttonActions={{
+                    quit: () => navigate("/"),
+                    nextRound: handleNextRound,
+                  }}
+                />
+              )
+            ) : // Player mode messages
+            winner === "X" ? (
               <ModalContent
-                title={gameMode === "cpu" ? "YOU WON!" : "PLAYER 1 WINS!"}
+                title="PLAYER 1 WINS!"
                 winnerType="X"
                 message="TAKES THE ROUND"
                 buttonLeft="QUIT"
@@ -98,17 +158,9 @@ const Board = () => {
               />
             ) : (
               <ModalContent
-                title={
-                  gameMode === "cpu"
-                    ? playerMark === "O"
-                      ? "YOU WON!"
-                      : "OH NO, YOU LOST…"
-                    : currentPlayer === "X" // If X is current, O went second (and won)
-                      ? "PLAYER 2 WINS!"
-                      : "PLAYER 1 WINS!"
-                }
-                message="TAKES THE ROUND"
+                title="PLAYER 2 WINS!"
                 winnerType="O"
+                message="TAKES THE ROUND"
                 buttonLeft="QUIT"
                 buttonRight="NEXT ROUND"
                 buttonActions={{
@@ -118,43 +170,14 @@ const Board = () => {
               />
             )}
           </Modal>
-          //    <Modal>
-          //    {winner === "X" ? (
-          //      <ModalContent
-          //        title={
-          //          gameMode === "cpu" ? "YOU WON!" : "PLAYER 1 WINS!"
-          //        }
-          //        winnerType="X"
-          //        message="TAKES THE ROUND"
-          //        buttonLeft="QUIT"
-          //        buttonRight="NEXT ROUND"
-          //        buttonActions={{
-          //          quit: () => navigate("/"),
-          //          nextRound: handleNextRound,
-          //        }}
-          //      />
-          //    ) : (
-          //      <ModalContent
-          //        title={gameMode === "cpu" ? "OH NO, YOU LOST…" : "PLAYER 2 WINS!"}
-          //        message="TAKES THE ROUND"
-          //        winnerType="O"
-          //        buttonLeft="QUIT"
-          //        buttonRight="NEXT ROUND"
-          //        buttonActions={{
-          //          quit: () => navigate("/"),
-          //          nextRound: handleNextRound,
-          //        }}
-          //      />
-          //    )}
-          //  </Modal>
         )
       );
     }
+
     if (!winner && board.every((cell) => cell)) {
       return (
         <Modal>
           <ModalContent
-            // title="IT'S A TIE!"
             message="ROUND TIED"
             buttonLeft="QUIT"
             buttonRight="NEXT ROUND"
@@ -166,8 +189,6 @@ const Board = () => {
         </Modal>
       );
     }
-
-    // }
 
     if (showRestartModal) {
       return (
@@ -218,8 +239,7 @@ const Board = () => {
                     />
                   ))}
               </div>
-              {displayModal()}
-              {/* {} */}
+              <AnimatePresence>{displayModal()}</AnimatePresence>
             </>
           );
         })}

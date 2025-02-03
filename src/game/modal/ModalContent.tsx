@@ -4,7 +4,7 @@ import { useTicTacToe } from "../contexts/TicTacToeContext";
 
 interface ModalContentProps {
   title?: string;
-  winnerType?: "X" | "O";
+  winnerType?: "X" | "O" | string;
   message?: string;
   buttonActions?: {
     quit?: () => void;

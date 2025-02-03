@@ -27,7 +27,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 overflow-y-hidden h-svh w-svw md:gap-12">
+    <div className="flex h-svh w-svw flex-col items-center justify-center gap-8 overflow-y-hidden md:gap-12">
       <motion.span
         initial={{
           rotate: "0deg",
@@ -66,7 +66,10 @@ const Home = () => {
       >
         <Link to={"/game/cpu"}>
           <Buttons
-            onClick={() => setMode("cpu")}
+            onClick={() => {
+              dispatch({ type: "RESET" });
+              setMode("cpu");
+            }}
             className={`${btnClassName} bg-[#F2B137] shadow-[inset_0_-7px_0_0_#CC8B13]`}
           >
             NEW GAME (VS CPU)

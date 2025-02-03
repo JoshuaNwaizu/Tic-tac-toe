@@ -46,9 +46,9 @@ const Nav = () => {
               transition={{ duration: 1, ...springTransition }}
             >
               {currentPlayer === "X" ? (
-                <img src={"/icon-x-white.svg"} alt="X" className="w-4 h-4" />
+                <img src={"/icon-x-white.svg"} alt="X" className="h-4 w-4" />
               ) : (
-                <img src={"/icon-o-white.svg"} alt="X" className="w-4 h-4" />
+                <img src={"/icon-o-white.svg"} alt="O" className="h-4 w-4" />
               )}
             </motion.span>
             <span className="text-[0.875rem] tracking-[0.05469rem] text-[#A8BFC9] md:text-[1rem]">

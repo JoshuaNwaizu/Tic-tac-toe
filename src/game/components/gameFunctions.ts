@@ -26,54 +26,6 @@ const calculateWinner = (
   return { winner: null, winningCells: null };
 };
 
-// const findWinningMove = (board: CellValue[], player: string): number | null => {
-//   const lines = [
-//     [0, 1, 2],
-//     [3, 4, 5],
-//     [6, 7, 8],
-//     [0, 3, 6],
-//     [1, 4, 7],
-//     [2, 5, 8],
-//     [0, 4, 8],
-//     [2, 4, 6],
-//   ];
-
-//   for (const [a, b, c] of lines) {
-//     const cells = [board[a], board[b], board[c]];
-//     const nullIndex = cells.indexOf(null);
-
-//     if (
-//       nullIndex !== -1 &&
-//       cells.filter((cell) => cell === player).length === 2
-//     ) {
-//       const moveIndex = [a, b, c][nullIndex];
-
-//       if (typeof moveIndex === "number") {
-//         return moveIndex;
-//       }
-//     }
-//   }
-
-//   return null;
-// };
-
-// const getCpuMove = (board: string[]): number | null => {
-//   const winningMove = findWinningMove(board, "O");
-//   if (winningMove !== null) return winningMove;
-
-//   // Block opponent's winning move
-//   const blockingMove = findWinningMove(board, "X");
-//   if (blockingMove !== null) return blockingMove;
-
-//   // Take any available space
-//   const emptyCells = board
-//     .map((cell, idx) => (cell === null ? idx : null))
-//     .filter((idx): idx is number => idx !== null);
-
-//   return emptyCells.length > 0
-//     ? emptyCells[Math.floor(Math.random() * emptyCells.length)]
-//     : null;
-// };
 const findWinningMove = (board: CellValue[], player: string): number | null => {
   const lines = [
     [0, 1, 2],

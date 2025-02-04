@@ -28,7 +28,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex h-svh w-svw flex-col items-center justify-center gap-8 overflow-y-hidden md:gap-12">
+    <div className="flex flex-col items-center justify-center gap-8 overflow-y-hidden h-svh w-svw md:gap-12">
       <motion.span
         initial={{
           rotate: "0deg",
@@ -69,6 +69,8 @@ const Home = () => {
           <Buttons
             onClick={() => {
               dispatch({ type: "RESET" });
+              dispatch({ type: "SET_SELECTED_MODE", payload: true });
+
               setMode("cpu");
             }}
             className={`${btnClassName} bg-[#F2B137] shadow-[inset_0_-7px_0_0_#CC8B13]`}
@@ -81,6 +83,8 @@ const Home = () => {
           <Buttons
             onClick={() => {
               // dispatch({ type: "RESET" });
+              dispatch({ type: "SET_SELECTED_MODE", payload: true });
+
               setMode("player");
             }}
             className={`${btnClassName} bg-[#31C3BD] shadow-[inset_0_-7px_0_0_#118C87]`}

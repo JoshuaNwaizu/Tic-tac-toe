@@ -26,6 +26,10 @@ const ShowModal = () => {
     dispatch({ type: "RESTART" });
     dispatch({ type: "MODAL" });
   };
+  const handleQuit = () => {
+    navigate("/");
+    dispatch({ type: "SET_SELECTED_MODE", payload: false });
+  };
 
   const displayModal = () => {
     if (winner) {
@@ -42,7 +46,7 @@ const ShowModal = () => {
                   buttonLeft="QUIT"
                   buttonRight="NEXT ROUND"
                   buttonActions={{
-                    quit: () => navigate("/"),
+                    quit: handleQuit,
                     nextRound: handleNextRound,
                   }}
                 />
@@ -54,7 +58,7 @@ const ShowModal = () => {
                   buttonLeft="QUIT"
                   buttonRight="NEXT ROUND"
                   buttonActions={{
-                    quit: () => navigate("/"),
+                    quit: handleQuit,
                     nextRound: handleNextRound,
                   }}
                 />
@@ -67,7 +71,7 @@ const ShowModal = () => {
                 buttonLeft="QUIT"
                 buttonRight="NEXT ROUND"
                 buttonActions={{
-                  quit: () => navigate("/"),
+                  quit: handleQuit,
                   nextRound: handleNextRound,
                 }}
               />
@@ -79,7 +83,7 @@ const ShowModal = () => {
                 buttonLeft="QUIT"
                 buttonRight="NEXT ROUND"
                 buttonActions={{
-                  quit: () => navigate("/"),
+                  quit: handleQuit,
                   nextRound: handleNextRound,
                 }}
               />
@@ -97,7 +101,7 @@ const ShowModal = () => {
             buttonLeft="QUIT"
             buttonRight="NEXT ROUND"
             buttonActions={{
-              quit: () => navigate("/"),
+              quit: handleQuit,
               nextRound: handleNextRound,
             }}
           />

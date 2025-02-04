@@ -32,6 +32,7 @@ interface TicTacToeState {
   isBoardDisabled?: boolean;
   isShowModal?: boolean;
   lastPlayer: string | null;
+  hasSelectedMode: boolean;
 }
 
 interface reducerAction {
@@ -72,6 +73,7 @@ const initialState: TicTacToeState = {
   isBoardDisabled: false,
   isShowModal: false,
   lastPlayer: null,
+  hasSelectedMode: false,
 };
 
 const reducer = (state: TicTacToeState, action: reducerAction) => {
@@ -169,11 +171,15 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
         currentPlayer: action.payload,
       };
 
+    case "SET_SELECTED_MODE":
+      return { ...state, hasSelectedMode: action.payload };
+
     case "RESTART": {
       return {
         ...state,
         board: Array(9).fill(null),
-        currentPlayer: state.winner === "X" ? "O" : "X",
+        currentPlayer: state.lastPlayer === "X" ? "O" : "X",
+        // currentPlayer: state.winner === "X" ? "O" : "X",
         winner: null,
         winningCells: null,
         lastPlayer: null,
@@ -189,7 +195,8 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
       return {
         ...state,
         board: Array(9).fill(null),
-        currentPlayer: state.winner === "X" ? "O" : "X",
+        // currentPlayer: state.winner === "X" ? "O" : "X",
+        currentPlayer: "X",
         winner: null,
         winningCells: null,
         score: {
@@ -229,6 +236,7 @@ const TicTacToeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     isBoardDisabled,
     isShowModal,
     lastPlayer,
+    hasSelectedMode,
   } = state;
 
   useEffect(() => {
@@ -252,6 +260,7 @@ const TicTacToeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         isBoardDisabled,
         isShowModal,
         lastPlayer,
+        hasSelectedMode,
       }}
     >
       {children}

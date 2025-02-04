@@ -1,12 +1,10 @@
-import { useNavigate /* useParams*/ } from "react-router";
 import { useTicTacToe } from "../contexts/TicTacToeContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import X from "./X";
 import O from "./O";
-import Modal from "../modal/Modal";
 
-import ModalContent from "../modal/ModalContent";
 import { AnimatePresence } from "framer-motion";
+import ShowModal from "./ShowModal";
 
 const Board = () => {
   const {
@@ -21,12 +19,6 @@ const Board = () => {
     isBoardDisabled,
   } = useTicTacToe();
 
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState<boolean>(false);
-  // const { mode } = useParams();
-
-  // const isCPUMode = mode === "cpu";
-
   useEffect(() => {
     if (gameMode === "cpu") {
       // If CPU is X and it's their turn, disable the board and make the CPU move
@@ -34,7 +26,7 @@ const Board = () => {
         dispatch({ type: "IS_BOARD_DISABLED", payload: true }); // Disable the board
         const cpuMoveTimeout = setTimeout(() => {
           dispatch({ type: "CPU_MOVE" });
-        }, 500);
+        }, 1000);
 
         return () => clearTimeout(cpuMoveTimeout);
       }
@@ -44,7 +36,7 @@ const Board = () => {
         dispatch({ type: "IS_BOARD_DISABLED", payload: true }); // Disable the board
         const cpuMoveTimeout = setTimeout(() => {
           dispatch({ type: "CPU_MOVE" });
-        }, 500);
+        }, 1000);
 
         return () => clearTimeout(cpuMoveTimeout);
       }
@@ -52,18 +44,13 @@ const Board = () => {
   }, [currentPlayer, winner, gameMode, playerMark, dispatch]);
 
   useEffect(() => {
-    console.log("Board updated:", board);
-  }, [board]);
-
-  useEffect(() => {
     if (winner || board.every((cell) => cell)) {
       const modalTimeout = setTimeout(() => {
-        setShowModal(true);
+        dispatch({ type: "IS_SHOW_MODAL", payload: true });
       }, 1000); // Delay for 1 second
-
       return () => clearTimeout(modalTimeout);
     } else {
-      setShowModal(false);
+      dispatch({ type: "IS_SHOW_MODAL", payload: false });
     }
   }, [winner, board, showRestartModal]);
 
@@ -82,131 +69,16 @@ const Board = () => {
       });
       return;
     }
-
     dispatch({ type: "PLAY", payload: { index: i } });
   };
-  useEffect(() => {
-    console.log("Current Player:", currentPlayer);
-    console.log("Is Board Disabled:", isBoardDisabled);
-  }, [currentPlayer, isBoardDisabled]);
-
-  const getWinningCellClass = (i: number) => {
+  // getWinningCellClass(i, winningCells, winner);
+  const getWinningCellClass = (i: number): string => {
     if (winningCells && winningCells.includes(i)) {
       return winner === "X"
         ? "bg-[#31C3BD] shadow-[inset_0_-8px_0_0_#118C87]"
         : "bg-[#F2B137] shadow-[inset_0_-8px_0_0_#CC8B13]";
     }
     return "";
-  };
-
-  const handleRestart = () => {
-    dispatch({ type: "RESET" });
-    dispatch({ type: "RESTART_MODAL", payload: false });
-
-    // setShowRestartModal(false);
-  };
-
-  const handleNextRound = () => {
-    dispatch({ type: "RESTART" });
-    dispatch({ type: "MODAL" });
-  };
-
-  const displayModal = () => {
-    if (winner) {
-      return (
-        showModal && (
-          <Modal>
-            {gameMode === "cpu" ? (
-              // CPU mode messages
-              winner === playerMark ? (
-                <ModalContent
-                  title="YOU WON!"
-                  winnerType={winner}
-                  message="TAKES THE ROUND"
-                  buttonLeft="QUIT"
-                  buttonRight="NEXT ROUND"
-                  buttonActions={{
-                    quit: () => navigate("/"),
-                    nextRound: handleNextRound,
-                  }}
-                />
-              ) : (
-                <ModalContent
-                  title="OH NO, YOU LOST…"
-                  winnerType={winner}
-                  message="TAKES THE ROUND"
-                  buttonLeft="QUIT"
-                  buttonRight="NEXT ROUND"
-                  buttonActions={{
-                    quit: () => navigate("/"),
-                    nextRound: handleNextRound,
-                  }}
-                />
-              )
-            ) : // Player mode messages
-            winner === "X" ? (
-              <ModalContent
-                title="PLAYER 1 WINS!"
-                winnerType="X"
-                message="TAKES THE ROUND"
-                buttonLeft="QUIT"
-                buttonRight="NEXT ROUND"
-                buttonActions={{
-                  quit: () => navigate("/"),
-                  nextRound: handleNextRound,
-                }}
-              />
-            ) : (
-              <ModalContent
-                title="PLAYER 2 WINS!"
-                winnerType="O"
-                message="TAKES THE ROUND"
-                buttonLeft="QUIT"
-                buttonRight="NEXT ROUND"
-                buttonActions={{
-                  quit: () => navigate("/"),
-                  nextRound: handleNextRound,
-                }}
-              />
-            )}
-          </Modal>
-        )
-      );
-    }
-
-    if (!winner && board.every((cell) => cell)) {
-      return (
-        <Modal>
-          <ModalContent
-            message="ROUND TIED"
-            buttonLeft="QUIT"
-            buttonRight="NEXT ROUND"
-            buttonActions={{
-              quit: () => navigate("/"),
-              nextRound: handleNextRound,
-            }}
-          />
-        </Modal>
-      );
-    }
-
-    if (showRestartModal) {
-      return (
-        <Modal>
-          <ModalContent
-            message="RESTART GAME?"
-            buttonLeft="NO, CANCEL"
-            buttonRight="YES, RESTART"
-            buttonActions={{
-              quit: () => dispatch({ type: "RESTART_MODAL", payload: false }),
-              nextRound: handleRestart,
-            }}
-          />
-        </Modal>
-      );
-    }
-
-    return null;
   };
 
   return (
@@ -239,7 +111,9 @@ const Board = () => {
                     />
                   ))}
               </div>
-              <AnimatePresence>{displayModal()}</AnimatePresence>
+              <AnimatePresence>
+                <ShowModal />
+              </AnimatePresence>
             </>
           );
         })}

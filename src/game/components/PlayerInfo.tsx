@@ -7,7 +7,6 @@ const className: string =
 
 const PlayerInfo = () => {
   const { score, gameMode, playerMark } = useTicTacToe();
-  console.log(score);
 
   const leftButtonVariants = {
     initial: { x: -100, opacity: 0 },

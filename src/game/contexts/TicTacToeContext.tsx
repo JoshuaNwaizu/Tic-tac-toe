@@ -6,6 +6,11 @@ import React, {
   useEffect,
   useReducer,
 } from "react";
+import {
+  calculateWinner,
+  getCpuMove,
+  isBoardFull,
+} from "../components/gameFunctions";
 interface Score {
   X: number;
   O: number;
@@ -25,6 +30,8 @@ interface TicTacToeState {
   showRestartModal: boolean;
   isMarkSelected: boolean;
   isBoardDisabled?: boolean;
+  isShowModal?: boolean;
+  lastPlayer: string | null;
 }
 
 interface reducerAction {
@@ -34,7 +41,6 @@ interface reducerAction {
 interface TicTacToeContextType extends TicTacToeState {
   dispatch: Dispatch<reducerAction>;
 }
-type CellValue = string | null;
 
 const TicTacToeContext = createContext<TicTacToeContextType | undefined>(
   undefined,
@@ -64,81 +70,8 @@ const initialState: TicTacToeState = {
   showRestartModal: false,
   isMarkSelected: false,
   isBoardDisabled: false,
-};
-
-const isBoardFull = (board: string[]): boolean => {
-  return board.every((cell) => cell !== null);
-};
-
-const calculateWinner = (
-  board: string[],
-): { winner: string | null; winningCells: number[] | null } => {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return { winner: board[a], winningCells: [a, b, c] };
-    }
-  }
-  return { winner: null, winningCells: null };
-};
-
-const findWinningMove = (board: CellValue[], player: string): number | null => {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-
-  for (const [a, b, c] of lines) {
-    const cells = [board[a], board[b], board[c]];
-    const nullIndex = cells.indexOf(null);
-
-    if (
-      nullIndex !== -1 &&
-      cells.filter((cell) => cell === player).length === 2
-    ) {
-      const moveIndex = [a, b, c][nullIndex];
-
-      if (typeof moveIndex === "number") {
-        return moveIndex;
-      }
-    }
-  }
-
-  return null;
-};
-
-const getCpuMove = (board: string[]): number | null => {
-  const winningMove = findWinningMove(board, "O");
-  if (winningMove !== null) return winningMove;
-
-  // Block opponent's winning move
-  const blockingMove = findWinningMove(board, "X");
-  if (blockingMove !== null) return blockingMove;
-
-  // Take any available space
-  const emptyCells = board
-    .map((cell, idx) => (cell === null ? idx : null))
-    .filter((idx): idx is number => idx !== null);
-
-  return emptyCells.length > 0
-    ? emptyCells[Math.floor(Math.random() * emptyCells.length)]
-    : null;
+  isShowModal: false,
+  lastPlayer: null,
 };
 
 const reducer = (state: TicTacToeState, action: reducerAction) => {
@@ -155,7 +88,7 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
       let score: Score = { ...state.score };
       if (winner) {
         score[winner as keyof Score]++;
-      } else if (isTied) {
+      } else if (isTied && !state.isTied) {
         score.tied++;
       }
 
@@ -167,6 +100,7 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
         score,
         isTied,
         winningCells,
+        lastPlayer: state.currentPlayer,
       };
     }
 
@@ -186,7 +120,7 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
       let score: Score = { ...state.score };
       if (winner) {
         score[winner as keyof Score]++;
-      } else if (isTied) {
+      } else if (isTied && !state.isTied) {
         score.tied++;
       }
 
@@ -199,6 +133,7 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
         isTied,
         winningCells,
         isBoardDisabled: false, // Re-enable the board after the CPU moves
+        lastPlayer: cpuMark,
       };
     }
 
@@ -225,7 +160,6 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
         ...state,
         playerMark: mark,
         currentPlayer: "X",
-        // gameMode: state.gameMode,
         isMarkSelected: true,
       };
 
@@ -240,14 +174,15 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
         ...state,
         board: Array(9).fill(null),
         currentPlayer: state.winner === "X" ? "O" : "X",
-        // currentPlayer: state.isTied
-        //   ? state.currentPlayer
-        //   : state.winner === "X"
-        //     ? "O"
-        //     : "X",
         winner: null,
         winningCells: null,
         lastPlayer: null,
+      };
+    }
+    case "IS_SHOW_MODAL": {
+      return {
+        ...state,
+        isShowModal: action.payload,
       };
     }
     case "RESET": {
@@ -263,6 +198,7 @@ const reducer = (state: TicTacToeState, action: reducerAction) => {
           tied: 0,
         },
         isTied: false,
+        lastPlayer: null,
       };
     }
     case "SET_MODE": {
@@ -291,6 +227,8 @@ const TicTacToeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     showRestartModal,
     isMarkSelected,
     isBoardDisabled,
+    isShowModal,
+    lastPlayer,
   } = state;
 
   useEffect(() => {
@@ -312,6 +250,8 @@ const TicTacToeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         showRestartModal,
         isMarkSelected,
         isBoardDisabled,
+        isShowModal,
+        lastPlayer,
       }}
     >
       {children}

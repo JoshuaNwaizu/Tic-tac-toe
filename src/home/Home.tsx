@@ -12,6 +12,7 @@ const Home = () => {
   const setMode = (mode: "player" | "cpu") => {
     dispatch({ type: "SET_MODE", payload: { mode } });
     dispatch({ type: "RESET" });
+    dispatch({ type: "SET_CURRENT_PLAYER", payload: "X" });
 
     if (mode === "cpu") {
       const cpuMark = playerMark === "X" ? "O" : "X";
@@ -21,7 +22,7 @@ const Home = () => {
         dispatch({ type: "SET_CURRENT_PLAYER", payload: "X" });
         setTimeout(() => {
           dispatch({ type: "CPU_MOVE" });
-        }, 500);
+        }, 1000);
       }
     }
   };
@@ -78,7 +79,10 @@ const Home = () => {
         <Link to={"/game/player"}>
           {" "}
           <Buttons
-            onClick={() => setMode("player")}
+            onClick={() => {
+              // dispatch({ type: "RESET" });
+              setMode("player");
+            }}
             className={`${btnClassName} bg-[#31C3BD] shadow-[inset_0_-7px_0_0_#118C87]`}
           >
             NEW GAME (VS PLAYER)

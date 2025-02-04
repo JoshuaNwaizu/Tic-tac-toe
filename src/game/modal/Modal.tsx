@@ -8,7 +8,7 @@ type Children = {
 const Modal: React.FC<Children> = ({ children }) => {
   return (
     <>
-      <div className="fixed top-0 left-0 flex items-center justify-center w-screen h-screen">
+      <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center">
         <div
           className={`fixed left-0 top-0 flex h-screen w-screen items-center justify-center bg-[#000] opacity-15`}
         ></div>

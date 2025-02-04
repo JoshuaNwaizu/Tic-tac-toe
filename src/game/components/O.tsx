@@ -8,7 +8,7 @@ const O: React.FC<O> = ({ fill = "#F2B137" }) => {
   useEffect(() => {
     const handleResize = () => {
       if (window.matchMedia("(min-width: 720px)").matches) {
-        setViewBox("-5 30 70 10");
+        setViewBox("-12 30 90 2");
       } else {
         setViewBox("0 -20 60 100");
       }

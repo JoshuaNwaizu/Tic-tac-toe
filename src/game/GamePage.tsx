@@ -18,7 +18,7 @@ const GamePage = () => {
   if (!hasSelectedMode) return null; // Prevent rendering before redirect
 
   return (
-    <div className="flex flex-col items-center flex-shrink-0 mt-5 md:mt-0 md:h-svh md:justify-center">
+    <div className="mt-5 flex flex-shrink-0 flex-col items-center md:mt-0 md:h-svh md:justify-center">
       <Nav />
       <Board />
       <PlayerInfo />

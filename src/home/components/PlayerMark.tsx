@@ -15,31 +15,10 @@ const PlayerMark = () => {
     setSelectedMark(playerMark);
   }, [playerMark]);
 
-  // useEffect(() => {
-  //   if (gameMode === "cpu" && cpuMark === "X") {
-  //     const timer = setTimeout(() => {
-  //       dispatch({ type: "CPU_MOVE" });
-  //     }, 500);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [gameMode, cpuMark, dispatch]);
-
-  // const handleMarkSelection = (mark: "X" | "O") => {
-  //   setSelectedMark(mark);
-
-  //   dispatch({ type: "SET_MARK", payload: { mark } });
-
-  //   console.log(
-  //     ` playerMark is ${playerMark} ,
-  //      currentPlayer is ${currentPlayer},
-  //      `,
-  //   );
-  // };
   const handleMarkSelection = (mark: "X" | "O") => {
     setSelectedMark(mark);
     dispatch({ type: "SET_MARK", payload: { mark } });
 
-    // If the player chooses O, the CPU (X) should go first
     if (gameMode === "cpu" && mark === "O") {
       setTimeout(() => {
         dispatch({ type: "CPU_MOVE" });
@@ -52,13 +31,7 @@ const PlayerMark = () => {
        Game mode is ${gameMode}`,
     );
   };
-  // const handleMarkSelection = (mark: "X" | "O") => {
-  //   setSelectedMark(mark);
-  //   dispatch({ type: "SET_MARK", payload: { mark } });
-  //   dispatch({ type: "SET_PLAYER_ONE", payload:{ mark} });
 
-  //   console.log(playerMark, currentPlayer);
-  // };
   return (
     <motion.div
       initial="initial"

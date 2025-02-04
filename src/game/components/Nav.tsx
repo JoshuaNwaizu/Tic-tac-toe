@@ -1,10 +1,11 @@
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import { useTicTacToe } from "../contexts/TicTacToeContext";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 const Nav = () => {
   const { currentPlayer, dispatch, playerMark } = useTicTacToe();
+  const navigate = useNavigate();
   const variants = {
     initial: { y: currentPlayer === "X" ? -25 : 25, opacity: 0 },
     animate: { y: 0, opacity: 1 },
@@ -18,6 +19,7 @@ const Nav = () => {
 
   const confirmRestart = () => {
     dispatch({ type: "RESTART_MODAL", payload: true });
+    dispatch({ type: "SET_SELECTED_MODE", payload: false });
   };
   useEffect(() => {
     // Set initial player based on playerMark
@@ -28,13 +30,15 @@ const Nav = () => {
     <>
       <nav className="mt-5 flex w-full items-center justify-between min-[344px]:w-[20rem] md:w-[30rem] xl:w-[24rem]">
         <div className="flex items-center">
-          <Link to={"/"}>
-            <img
-              src="/logo.svg"
-              alt="logo"
-              className="h-[2rem] w-[4.49813rem]"
-            />
-          </Link>
+          <img
+            src="/logo.svg"
+            alt="logo"
+            className="h-[2rem] w-[4.49813rem]"
+            onClick={() => {
+              navigate("/");
+              dispatch({ type: "SET_SELECTED_MODE", payload: false });
+            }}
+          />
 
           <div className="ml-[3rem] flex h-[2.5rem] w-[6rem] items-center justify-center gap-2 rounded-[0.5375rem] bg-[#1F3641] font-bold tracking-[0.0625rem] text-[#1A2A33] shadow-[inset_0_-4px_0_0_#10212A] max-sm:pb-1 md:h-[3.25rem] md:w-[8.75rem]">
             <motion.span

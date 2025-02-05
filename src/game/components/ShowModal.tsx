@@ -18,8 +18,10 @@ const ShowModal = () => {
   const navigate = useNavigate();
 
   const handleRestart = () => {
-    dispatch({ type: "RESET" });
     dispatch({ type: "RESTART_MODAL", payload: false });
+    dispatch({ type: "RESET" });
+    dispatch({ type: "SET_SELECTED_MODE", payload: false });
+    navigate("/");
   };
 
   const handleNextRound = () => {
